@@ -21,14 +21,17 @@ services:
       - GF_SECURITY_ADMIN_USER=${GRAFANA_ADMIN_USER}
       - GF_SECURITY_ADMIN_PASSWORD=${GRAFANA_ADMIN_PASSWORD}
     volumes:
-      - ./grafana:/etc/grafana/provisioning/datasources
+      - ./grafana/datasource.yml:/etc/grafana/provisioning/datasources/datasource.yml
+      - ./grafana/dashboard.yml:/etc/grafana/provisioning/dashboards/dashboard.yml
+      - ./grafana/dashboards:/etc/grafana/dashboards
 
   scylla:
     image: scylladb/scylla:5.4
     container_name: scylla
     ports:
-      - "9042:9042" # CQL
-      - "10000:10000" # REST API
+      - 9042:9042 # CQL
+      - 9180:9180 # Metrics
+      - 10000:10000 # REST API
     volumes:
       - scylla-data:/var/lib/scylla
     command: --smp 1 --memory 750M
@@ -42,8 +45,8 @@ services:
     image: rabbitmq:3-management
     container_name: rabbitmq
     ports:
-      - "5672:5672"    # AMQP
-      - "15672:15672"  # Management UI
+      - 5672:5672    # AMQP
+      - 15672:15672  # Management UI
     environment:
       - RABBITMQ_DEFAULT_USER=${RABBITMQ_ADMIN_USER}
       - RABBITMQ_DEFAULT_PASS=${RABBITMQ_ADMIN_PASSWORD}
@@ -57,7 +60,7 @@ services:
     image: nginx:alpine
     container_name: nginx
     ports:
-      - "8080:80"
+      - 8080:80
     volumes:
       - ./nginx.conf:/etc/nginx/nginx.conf:ro
     depends_on:
