@@ -1590,7 +1590,10 @@
   ],
   "schemaVersion": 16,
   "style": "dark",
-  "tags": [],
+  "tags": [
+    "prometheus",
+    "scylladb"
+  ],
   "templating": {
     "list": []
   },
