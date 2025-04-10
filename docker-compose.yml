@@ -3,7 +3,7 @@ services:
     image: prom/prometheus
     container_name: prometheus
     command:
-      - '--config.file=/etc/prometheus/config.yml'
+      - --config.file=/etc/prometheus/config.yml
     ports:
       - 9090:9090
     restart: unless-stopped
@@ -25,6 +25,25 @@ services:
       - ./grafana/dashboard.yml:/etc/grafana/provisioning/dashboards/dashboard.yml
       - ./grafana/dashboards:/etc/grafana/dashboards
 
+  loki:
+    image: grafana/loki
+    container_name: loki
+    ports:
+      - 3100:3100
+    command: -config.file=/etc/loki/config.yml
+    volumes:
+      - ./loki/config.yml:/etc/loki/config.yml
+
+  promtail:
+    image: grafana/promtail
+    container_name: promtail
+    volumes:
+      - /var/log:/var/log
+      - /etc/machine-id:/etc/machine-id
+      - ./promtail/config.yml:/etc/promtail/config.yml
+    depends_on:
+      - loki
+
   scylla:
     image: scylladb/scylla:5.4
     container_name: scylla
@@ -42,14 +61,17 @@ services:
       retries: 5
 
   rabbitmq:
-    image: rabbitmq:3-management
+    image: rabbitmq:4.0.8-management
     container_name: rabbitmq
     ports:
       - 5672:5672    # AMQP
       - 15672:15672  # Management UI
+      - 15692:15692 # Metrics
     environment:
       - RABBITMQ_DEFAULT_USER=${RABBITMQ_ADMIN_USER}
       - RABBITMQ_DEFAULT_PASS=${RABBITMQ_ADMIN_PASSWORD}
+    entrypoint: ["rabbitmq-server"]
+    command: ["bash", "-c", "rabbitmq-plugins enable rabbitmq_prometheus && tail -f /dev/null"]
     healthcheck:
       test: ["CMD", "rabbitmq-diagnostics", "status"]
       interval: 30s

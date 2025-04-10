@@ -27,3 +27,7 @@ scrape_configs:
   static_configs:
     - targets:
       - redis-exporter:9121
+- job_name: rabbitmq
+  static_configs:
+    - targets:
+      - rabbitmq:15692
