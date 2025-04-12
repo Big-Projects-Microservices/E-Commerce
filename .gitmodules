@@ -1,3 +1,6 @@
 [submodule "users"]
 	path = users
 	url = https://github.com/Big-Projects-Microservices/users
+[submodule "graphql"]
+	path = graphql
+	url = https://github.com/Big-Projects-Microservices/graphql
