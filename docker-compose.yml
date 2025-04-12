@@ -139,8 +139,50 @@ services:
     volumes:
       - ./nginx.conf:/etc/nginx/nginx.conf:ro
     depends_on:
-      - rabbitmq
-      - scylla
+      - graphql-1
+      - graphql-2
+      - graphql-3
+
+  graphql-1:
+    build:
+      context: ./graphql
+      dockerfile: Dockerfile
+    container_name: graphql-1
+    environment:
+      - RABBITMQ_URL=amqp://${RABBITMQ_ADMIN_USER}:${RABBITMQ_ADMIN_PASSWORD}@rabbitmq:5672
+    depends_on:
+      rabbitmq:
+        condition: service_healthy
+    expose:
+      - 8000
+
+  graphql-2:
+    build:
+      context: ./graphql
+      dockerfile: Dockerfile
+    container_name: graphql-2
+    environment:
+      - RABBITMQ_URL=amqp://${RABBITMQ_ADMIN_USER}:${RABBITMQ_ADMIN_PASSWORD}@rabbitmq:5672
+    depends_on:
+      rabbitmq:
+        condition: service_healthy
+    expose:
+      - 8000
+
+  graphql-3:
+    build:
+      context: ./graphql
+      dockerfile: Dockerfile
+    container_name: graphql-3
+    environment:
+      - RABBITMQ_URL=amqp://${RABBITMQ_ADMIN_USER}:${RABBITMQ_ADMIN_PASSWORD}@rabbitmq:5672
+    depends_on:
+      rabbitmq:
+        condition: service_healthy
+    ports:
+      - 8000:8002
+    expose:
+      - 8000
 
   users:
     build:
