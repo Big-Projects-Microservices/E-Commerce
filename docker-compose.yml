@@ -70,6 +70,11 @@ services:
     environment:
       - POSTGRES_USER=${POSTGRES_ADMIN_USER}
       - POSTGRES_PASSWORD=${POSTGRES_ADMIN_PASSWORD}
+    healthcheck:
+      test: ["CMD", "pg_isready"]
+      interval: 30s
+      timeout: 10s
+      retries: 5
 
   postgres-exporter:
     image: prometheuscommunity/postgres-exporter
@@ -193,6 +198,17 @@ services:
       - RABBITMQ_URL=amqp://${RABBITMQ_ADMIN_USER}:${RABBITMQ_ADMIN_PASSWORD}@rabbitmq:5672
     depends_on:
       rabbitmq:
+        condition: service_healthy
+
+  orders:
+    build:
+      context: ./orders
+      dockerfile: Dockerfile
+    container_name: orders
+    environment:
+      - POSTGRES_URL=postgres://${POSTGRES_ADMIN_USER}:${POSTGRES_ADMIN_PASSWORD}@postgres:5432/orders
+    depends_on:
+      postgres:
         condition: service_healthy
 
 volumes:
