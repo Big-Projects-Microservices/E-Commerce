@@ -7,3 +7,6 @@
 [submodule "products"]
 	path = products
 	url = https://github.com/Big-Projects-Microservices/products
+[submodule "orders"]
+	path = orders
+	url = https://github.com/Big-Projects-Microservices/orders
