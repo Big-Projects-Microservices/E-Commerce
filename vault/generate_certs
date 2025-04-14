@@ -1,0 +1,7 @@
+#!/usr/bin/bash
+
+mkdir certs
+
+openssl genrsa -out certs/vault.key 2048
+openssl req -new -key certs/vault.key -subj "/CN=localhost" -out certs/vault.csr
+openssl x509 -req -in certs/vault.csr -signkey certs/vault.key -out certs/vault.crt -days 365

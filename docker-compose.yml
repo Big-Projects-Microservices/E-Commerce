@@ -44,6 +44,19 @@ services:
     depends_on:
       - loki
 
+  vault:
+    image: hashicorp/vault:latest
+    container_name: vault
+    ports:
+      - "8200:8200"
+    volumes:
+      - ./vault/config:/vault/config
+      - ./vault/certs:/vault/certs
+      - vault-data:/vault/data
+    cap_add:
+      - IPC_LOCK
+    command: "sh -c 'chmod 600 /vault/certs/vault.key && vault server -config=/vault/config/vault.hcl'"
+
   scylla:
     image: scylladb/scylla:5.4
     container_name: scylla
@@ -216,3 +229,4 @@ volumes:
   prometheus-data:
   minio-data:
   postgres-data:
+  vault-data:
