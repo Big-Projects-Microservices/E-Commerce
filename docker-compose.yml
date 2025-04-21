@@ -57,22 +57,6 @@ services:
       - IPC_LOCK
     command: "sh -c 'chmod 600 /vault/certs/vault.key && vault server -config=/vault/config/vault.hcl'"
 
-  scylla:
-    image: scylladb/scylla:5.4
-    container_name: scylla
-    ports:
-      - 9042:9042 # CQL
-      - 9180:9180 # Metrics
-      - 10000:10000 # REST API
-    volumes:
-      - scylla-data:/var/lib/scylla
-    command: --smp 1 --memory 750M
-    healthcheck:
-      test: ["CMD", "cqlsh", "-e", "DESCRIBE KEYSPACES"]
-      interval: 30s
-      timeout: 10s
-      retries: 5
-
   postgres:
     image: postgres:17.4-alpine3.21
     container_name: postgres
@@ -80,6 +64,7 @@ services:
       - 5432:5432
     volumes:
       - postgres-data:/var/lib/postgresql/data
+      - ./postgres/init_databases.sql:/docker-entrypoint-initdb.d/init_databases.sql:ro
     environment:
       - POSTGRES_USER=${POSTGRES_ADMIN_USER}
       - POSTGRES_PASSWORD=${POSTGRES_ADMIN_PASSWORD}
@@ -219,7 +204,7 @@ services:
       dockerfile: Dockerfile
     container_name: orders
     environment:
-      - POSTGRES_URL=postgres://${POSTGRES_ADMIN_USER}:${POSTGRES_ADMIN_PASSWORD}@postgres:5432/orders
+      - DATABASE_URL=postgres://${POSTGRES_ADMIN_USER}:${POSTGRES_ADMIN_PASSWORD}@postgres:5432/orders
     depends_on:
       postgres:
         condition: service_healthy
